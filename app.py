@@ -9,7 +9,9 @@ app = Flask(__name__)
 
 # Helper function to find a post by id
 def find_post(post_id):
-    return next((post.to_dict() for post in posts if post.to_dict()['id'] == post_id), None)
+
+    # post.to_dict()['id']
+    return next((post for post in posts if str(post.id) == post_id), None)
 
 
 @app.route("/")
@@ -38,7 +40,7 @@ def get_post(id):
     if post is None:
         return jsonify({'error': 'Post not found'}), 404
 
-    return jsonify(post)
+    return jsonify(post.to_dict()), 200
 
 
 @app.route("/posts/<id>", methods=['PUT'])
@@ -60,13 +62,23 @@ def update_post(id):
         return jsonify({'error': 'Missing required fields'}), 400
 
     # Обновление поста
-    post['author'] = author
-    post['title'] = title
-    post['content'] = content
+    post.author = author
+    post.title = title
+    post.content = content
 
-    # Update the post
-    # post.update(title=title, author=author, content=content)
-    return jsonify(post), 200
+    return jsonify(post.to_dict()), 200
+
+
+@app.route("/posts/<id>", methods=['DELETE'])
+def delete_post(id):
+
+    post = find_post(id)
+
+    if post is None:
+        return jsonify({'error': 'Post not found'}), 404
+
+    posts.remove(post)
+    return jsonify({'result': 'success'}), 200
 
 
 if __name__ == '__main__':
