@@ -51,13 +51,22 @@ def update_post(id):
     if post is None:
         return jsonify({'error': 'Post not found'}), 404
 
-    author = post_data.get['author']
+    author = post_data.get('author')
     title = post_data.get('title')
     content = post_data.get('content')
 
+    # Проверка наличия необходимых полей
+    if not all([author, title, content]):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    # Обновление поста
+    post['author'] = author
+    post['title'] = title
+    post['content'] = content
+
     # Update the post
-    post.update(title=title, author=author, content=content)
-    return jsonify(post.to_dict()), 200
+    # post.update(title=title, author=author, content=content)
+    return jsonify(post), 200
 
 
 if __name__ == '__main__':
